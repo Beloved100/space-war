@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Space War</title>
+<link href="../bootstrap 3.3.7/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<script src="../bootstrap 3.3.7/dist/js/bootstrap.js"></script>
+<script src="../jquery-3.1.1.js"></script>
+</head>
+<body >
+<div class="container-fluid" style="background-color: black; margin: 30px;">
+<div class="row">
+<div class="col-md-5">
+<canvas id="dan" height="500" width="500" style="border:1px solid black;"></canvas>
+</div>
+<div class="col-md-7" style="padding-right: 30px; padding-top: 30px; width:300px;">
+<table class="table table-bordered">
+<tr>
+<td class="success">Name</td>
+<td class="info">Score</td>
+<td class="warning">Level</td>
+<td class="danger">Highscore</td>
+</tr>
+<tr>
+<td id="nam" style="color: green;"></td>
+<td id="scor" style="color: red">0</td>
+<td id="level" style="color: orange">1</td>
+<td id="high" style="color:purple">0</td>
+<tr>
+
+</table>
+</div>
+</div>
+</div>
+<script>
+
+var dW=40;
+var dH=40;
+var cHeight=500;
+var cWidth=500;
+var dy=cHeight-dH;
+var dx=(cWidth-dW)/2;
+var ey=100;
+var ex=40 ;
+var rightPressed= false;
+var leftPressed= false;
+var laser=[];
+var l;
+var p;
+var back;
+var back_2;
+var back_3;
+var img;
+var ene
+var enemy=[];
+enemyTotal = 6;
+var highScore_=document.getElementById("high");
+score=document.getElementById('scor');
+namee=document.getElementById('nam');
+level=document.getElementById('level');
+
+for(var x=0;x<enemyTotal;x++){
+	
+	enemy.push([ene,ex,ey,dW,dH]);
+	ex+=dW+40;
+}
+window.onload = function(){
+	var strt=prompt('What is your Name');
+	namee.innerHTML=strt;
+p=document.getElementById("dan");
+l=p.getContext("2d");
+img=new Image();
+img.src='ship.png';
+ene=new Image();
+ene.src='enemy.png';
+back=new Image();
+back.src='space.jpg'
+
+document.addEventListener("keydown",keyDownHandler,false);
+document.addEventListener("keyup", keyUpHandler, false);
+if(strt==""){
+	namee.innerHTML="Null";
+}
+}
+
+
+function drawImage(){
+	if(level.innerHTML==1){
+	l.drawImage(back,0,0,500,500);
+l.drawImage(img,dx,dy,dW,dH);
+}
+if(level.innerHTML==2){
+			ey+=100;
+			back_2=new Image();
+			back_2.src='space3.jpg';
+			l.drawImage(back_2,0,0,500,500);
+			l.drawImage(img,dx,dy,dW,dH);
+	}if(level.innerHTML==3){
+		 ey+=200;
+		 back_3=new Image();
+		 back_3.src="space4.jpg"
+		 l.drawImage(back_3,0,0,500,500);
+		 l.drawImage(img,dx,dy,dW,dH);
+	}
+
+}
+
+function drawEnemy(){
+	for(y=0;y<enemy.length;y++){
+l.drawImage(ene,enemy[y][1],enemy[y][2],enemy[y][3],enemy[y][4]);
+	if(enemy[y][2]>0){
+	enemy[y][2]+=2;
+	} if(enemy[y][2]>cHeight+5){
+		enemy[y][2]=10;
+	}
+	}
+}
+function hitEnemy(){
+	for(d=0;d<laser.length;d++){
+		for(e=0;e<enemy.length;e++){
+	if((laser[d][0]>enemy[e][1]&&laser[d][0]<(enemy[e][1]+dW))&&(laser[d][1]<dH+enemy[e][2])){
+	enemy.splice(e,1);
+	laser.splice(d,1);
+	enemy.push([ene,Math.random()*470,10,dW,dH]);
+	score.innerHTML=parseInt(score.innerHTML)+1;
+	  if(score.innerHTML==100){
+		  
+		  level.innerHTML=parseInt(level.innerHTML)+1;
+		;
+	  }
+	  if(score.innerHTML==300){
+		 
+		  level.innerHTML=parseInt(level.innerHTML)+1;
+	  }
+	}
+	}
+}
+}
+		function highScore(){
+	
+		/*if(score.innerHTML>highScore_.innerHTML){
+			highScore=score.innerHTML;
+			highScore.innerHTML=score.innerHTML;
+			alert("highscore:"+highScore)
+		}*/
+	}
+function collision(){
+	for(f=0;f<enemy.length;f++){
+		if(dx+30>enemy[f][1]&& dx<enemy[f][1]+enemy[f][3]&& enemy[f][2]+enemy[f][4]> dy){
+		clearInterval(t);
+		alert('Game Over');
+		alert(namee.innerHTML+"," +"your score is "+ score.innerHTML);
+		highScore();
+		location.reload;
+					}
+	}
+}
+
+//for the key codes
+
+
+function keyDownHandler(e){
+	if(e.keyCode==39){
+		rightPressed = true;
+		laser.push([(dx+dW/2)-2,dy-dH+10,3,20])	
+	}else if(e.keyCode == 37){
+		leftPressed = true;
+		laser.push([(dx+dW/2)-2,dy-dH+10,3,20])	
+	}
+	if(e.keyCode==32){
+		laser.push([(dx+dW/2)-2,dy-dH+10,3,20])
+	}
+}
+function keyUpHandler(e){
+	if(e.keyCode==39){
+		rightPressed = false;	
+	}else if(e.keyCode == 37){
+		leftPressed = false;	
+	}
+}
+
+function move(){
+	l.clearRect(0,0,500,500);
+		if(rightPressed && dx<500-dW){
+			dx += 2;	
+		}else if(leftPressed && dx>0){
+			dx -= 5;	
+		}
+}
+function drawLaser() {
+	  
+    for (var i = 0; i < laser.length; i++) {
+     l.fillStyle = '#f00';
+     l.fillRect(laser[i][0],laser[i][1],laser[i][2],laser[i][3])
+   }
+  }
+  
+function loose(){
+	
+	move();
+	drawImage();
+	drawLaser();
+	moveLaser();
+	drawEnemy();
+	hitEnemy();
+	collision();
+	
+}
+function moveLaser() {
+ for (var i = 0; i < laser.length; i++) {
+   if (laser[i][1] > -11) {
+      laser[i][1] -= 10;
+    } //else if (laser[i][1] < -10) {  
+     //laser.splice(i, 1);
+   //}
+
+}
+}
+
+var t=setInterval(loose,20)
+
+</script>
+</body>
+</html>
+
